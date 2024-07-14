@@ -1,6 +1,7 @@
 "use client";
 
-import { calculateAge } from "@/lib/util";
+import PresenceDot from "@/components/PresenceDot";
+import { calculateAge, transformImageUrl } from "@/lib/util";
 import {
   Button,
   Card,
@@ -8,9 +9,9 @@ import {
   CardFooter,
   Divider,
   Image,
-  Link,
 } from "@nextui-org/react";
 import { Member } from "@prisma/client";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 type Props = {
@@ -26,15 +27,21 @@ export default function MemberSidebar({ member, navLinks }: Props) {
       <Image
         height={200}
         width={200}
-        src={member.image || "images/user.png"}
+        src={transformImageUrl(member.image) || "/images/user.png"}
         alt="User profile main image"
         className="rounded-full mt-6 aspect-square object-cover"
       />
-      <CardBody>
+      <CardBody className="overflow-hidden">
         <div className="flex flex-col items-center">
-          <div className="text-2xl">
-            {member.name}, {calculateAge(member.dateOfBirth)}
+          <div className="flex">
+            <div className="text-2xl">
+              {member.name}, {calculateAge(member.dateOfBirth)}
+            </div>
+            <div>
+              <PresenceDot member={member} />
+            </div>
           </div>
+
           <div className="text-sm text-neutral-500">
             {member.city}, {member.country}
           </div>
@@ -45,11 +52,12 @@ export default function MemberSidebar({ member, navLinks }: Props) {
             <Link
               href={link.href}
               key={link.name}
-              className={`block rounded ${
-                pathname === link.href
-                  ? "text-secondary"
-                  : "hover:text-secondary/50"
-              }`}
+              className={`block rounded 
+                                ${
+                                  pathname === link.href
+                                    ? "text-secondary"
+                                    : "hover:text-secondary/50"
+                                }`}
             >
               {link.name}
             </Link>
