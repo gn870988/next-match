@@ -1,3 +1,4 @@
+import { updateLastActive } from "@/app/actions/memberActions";
 import { pusherClient } from "@/lib/pusher";
 import { Channel, Members } from "pusher-js";
 import { useCallback, useEffect, useRef } from "react";
@@ -38,8 +39,9 @@ export const usePresenceChannel = () => {
 
       channelRef.current.bind(
         "pusher:subscription_succeeded",
-        (members: Members) => {
+        async (members: Members) => {
           handleSetMembers(Object.keys(members.members));
+          await updateLastActive();
         }
       );
 
