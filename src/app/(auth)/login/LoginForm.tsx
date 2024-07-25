@@ -4,10 +4,12 @@ import { signInUser } from "@/app/actions/authActions";
 import { LoginSchema, loginSchema } from "@/lib/schemas/loginSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Card, CardBody, CardHeader, Input } from "@nextui-org/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { GiPadlock } from "react-icons/gi";
 import { toast } from "react-toastify";
+import SocialLogin from "./SocialLogin";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -22,7 +24,6 @@ export default function LoginForm() {
 
   const onSubmit = async (data: LoginSchema) => {
     const result = await signInUser(data);
-
     if (result.status === "success") {
       router.push("/members");
       router.refresh();
@@ -51,7 +52,7 @@ export default function LoginForm() {
               variant="bordered"
               {...register("email")}
               isInvalid={!!errors.email}
-              errorMessage={errors.email?.message}
+              errorMessage={errors.email?.message as string}
             />
             <Input
               defaultValue=""
@@ -60,7 +61,7 @@ export default function LoginForm() {
               type="password"
               {...register("password")}
               isInvalid={!!errors.password}
-              errorMessage={errors.password?.message}
+              errorMessage={errors.password?.message as string}
             />
             <Button
               isLoading={isSubmitting}
@@ -71,6 +72,10 @@ export default function LoginForm() {
             >
               Login
             </Button>
+            <SocialLogin />
+            <div className="flex justify-center hover:underline text-sm">
+              <Link href="/forgot-password">Forgot password?</Link>
+            </div>
           </div>
         </form>
       </CardBody>

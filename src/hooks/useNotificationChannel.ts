@@ -6,7 +6,10 @@ import { Channel } from "pusher-js";
 import { useCallback, useEffect, useRef } from "react";
 import useMessageStore from "./useMessageStore";
 
-export const useNotificationChannel = (userId: string | null) => {
+export const useNotificationChannel = (
+  userId: string | null,
+  profileComplete: boolean
+) => {
   const channelRef = useRef<Channel | null>(null);
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -31,15 +34,16 @@ export const useNotificationChannel = (userId: string | null) => {
     [add, pathname, searchParams, updateUnreadCount]
   );
 
-  const handleNewLike = useCallback(
-    (data: { name: string; image: string | null; userId: string }) => {
-      newLikeToast(data.name, data.image, data.userId);
-    },
-    []
-  );
+  const handleNewLike = (data: {
+    name: string;
+    image: string | null;
+    userId: string;
+  }) => {
+    newLikeToast(data.name, data.image, data.userId);
+  };
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !profileComplete) return;
     if (!channelRef.current) {
       channelRef.current = pusherClient.subscribe(`private-${userId}`);
 
@@ -55,5 +59,5 @@ export const useNotificationChannel = (userId: string | null) => {
         channelRef.current = null;
       }
     };
-  }, [userId, handleNewMessage, handleNewLike]);
+  }, [userId, handleNewMessage, profileComplete]);
 };
