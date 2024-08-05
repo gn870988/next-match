@@ -2,10 +2,12 @@
 
 import LikeButton from "@/components/LikeButton";
 import PresenceDot from "@/components/PresenceDot";
-import { calculateAge } from "@/lib/util";
+import { calculateAge, transformImageUrl } from "@/lib/util";
 import { Card, CardFooter, Image } from "@nextui-org/react";
 import { Member } from "@prisma/client";
 import Link from "next/link";
+import React, { useState } from "react";
+import { toggleLikeMember } from "../actions/likeActions";
 
 type Props = {
   member: Member;
@@ -13,7 +15,20 @@ type Props = {
 };
 
 export default function MemberCard({ member, likeIds }: Props) {
-  const hasLiked = likeIds.includes(member.userId);
+  const [hasLiked, setHasLiked] = useState(likeIds.includes(member.userId));
+  const [loading, setLoading] = useState(false);
+
+  async function toggleLike() {
+    setLoading(true);
+    try {
+      await toggleLikeMember(member.userId, hasLiked);
+      setHasLiked(!hasLiked);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const preventLinkAction = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -26,17 +41,22 @@ export default function MemberCard({ member, likeIds }: Props) {
         isZoomed
         alt={member.name}
         width={300}
-        src={member.image || "/images/user.png"}
+        src={transformImageUrl(member.image) || "/images/user.png"}
         className="aspect-square object-cover"
       />
       <div onClick={preventLinkAction}>
         <div className="absolute top-3 right-3 z-50">
-          <LikeButton targetId={member.userId} hasLiked={hasLiked} />
+          <LikeButton
+            loading={loading}
+            toggleLike={toggleLike}
+            hasLiked={hasLiked}
+          />
         </div>
         <div className="absolute top-2 left-3 z-50">
           <PresenceDot member={member} />
         </div>
       </div>
+
       <CardFooter className="flex justify-start bg-black overflow-hidden absolute bottom-0 z-10 bg-dark-gradient">
         <div className="flex flex-col text-white">
           <span className="font-semibold">
