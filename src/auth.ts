@@ -13,9 +13,9 @@ export const {
   callbacks: {
     async jwt({ user, token }) {
       if (user) {
-        token.profileComplete = user.profileComplete;
-        token.role = user.role;
-        user.email;
+        const customUser = user as any;
+        token.profileComplete = customUser.profileComplete;
+        token.role = customUser.role;
       }
       return token;
     },
